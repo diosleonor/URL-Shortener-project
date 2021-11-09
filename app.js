@@ -5,6 +5,7 @@ const URLshortener = require('./models/URLshortener')
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+const generate5digits = require('./generate5digits')
 
 // database connection
 const mongoose = require('mongoose')
@@ -25,12 +26,12 @@ app.get('/', (req,res) => {
 	res.render('index')
 })
 app.post('/result', (req, res) => {
-	const input = req.body
-	console.log(input)
-	// return Restaurant.create(data)
-	// 	.then(() => res.redirect('/'))
-	// 	.catch(error => console.log(error))
-	res.render('result')
+	const input = req.body //{inputURL:'http://google.com'}
+	const inputURL = req.body.inputURL
+	const fiveDigits = generate5digits()
+	return URLshortener.create({ inputURL, fiveDigits })
+		.then(() => res.render('result', { fiveDigits, inputURL }))
+		.catch(error => console.log(error))
 })
 
 app.listen(PORT, () => {
