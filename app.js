@@ -6,7 +6,6 @@ const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 
-
 // database connection
 const mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/URL-shortener')
@@ -24,6 +23,14 @@ app.use(methodOverride('_method'))
 //route setting
 app.get('/', (req,res) => {
 	res.render('index')
+})
+app.post('/result', (req, res) => {
+	const input = req.body
+	console.log(input)
+	// return Restaurant.create(data)
+	// 	.then(() => res.redirect('/'))
+	// 	.catch(error => console.log(error))
+	res.render('result')
 })
 
 app.listen(PORT, () => {
