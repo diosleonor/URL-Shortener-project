@@ -22,10 +22,12 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.get('/', (req,res) => {
 	res.render('index')
 })
+// 輸入相同網址時，產生一樣的縮址
 app.post('/result', (req, res) => {
 	const fiveDigits = generate5digits()
-	// const copy = copy()
+	// 用inputURL為依據找出一筆資料
 	URLshortener.findOne({inputURL:req.body.inputURL})
+	// 以三元運算子判斷資料是否存在，不存在就創一個
 	.then(data => data ? data : URLshortener.create({ inputURL:req.body.inputURL, fiveDigits }))
 	.then(data => res.render('result', { fiveDigits:data.fiveDigits, inputURL:req.body.inputURL}))
 	.catch(error => console.log(error))

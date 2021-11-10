@@ -41,7 +41,6 @@
   Bootstrap v4.3.1<br> 
   jquery v3.3.1<br> 
   popper v2.9.1<br> 
-  font-awesome v5.8.1<br> 
   mongoose v6.0.12<br>
 
 
