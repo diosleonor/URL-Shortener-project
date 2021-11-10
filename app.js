@@ -25,14 +25,24 @@ app.use(methodOverride('_method'))
 app.get('/', (req,res) => {
 	res.render('index')
 })
+
 app.post('/result', (req, res) => {
-	const input = req.body //{inputURL:'http://google.com'}
-	const inputURL = req.body.inputURL
 	const fiveDigits = generate5digits()
-	return URLshortener.create({ inputURL, fiveDigits })
-		.then(() => res.render('result', { fiveDigits, inputURL }))
-		.catch(error => console.log(error))
+	// const copy = copy()
+	URLshortener.findOne({inputURL:req.body.inputURL})
+	.then(data => data ? data : URLshortener.create({ inputURL:req.body.inputURL, fiveDigits }))
+	.then(data => res.render('result', { fiveDigits:data.fiveDigits, inputURL:req.body.inputURL}))
+	.catch(error => console.log(error))
 })
 
+app.get('/:id', (req,res) => {
+	const id = req.params.id
+	URLshortener.find({ fiveDigits:id })
+	.lean()
+	.then(data => res.redirect(data[0].inputURL))
+	.catch(error => console.log(error))
+})
+
+// app listening
 app.listen(PORT, () => {
 	console.log(`App is running on http://localhost:${PORT}`)})

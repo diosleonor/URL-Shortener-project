@@ -1,0 +1,21 @@
+original ver:
+app.post('/result', (req, res) => {
+	const input = req.body //{inputURL:'http://google.com'}
+	const inputURL = req.body.inputURL // 'http://'
+	const fiveDigits = generate5digits() //亂數五碼
+	// URLshortener.find({'':''})
+	return URLshortener.create({ inputURL, fiveDigits })
+		.then(() => res.render('result', { fiveDigits, inputURL }))
+		.catch(error => console.log(error))
+})
+
+// 輸入相同網址時，產生一樣的縮址。
+app.post('/result', (req, res) => {
+	const input = req.body //{inputURL:'http://google.com'}
+	const inputURL = req.body.inputURL // 'http://...'
+	const fiveDigits = generate5digits() //亂數五碼
+	return URLshortener.find({inputURL:inputURL})
+		.lean()
+		.then(data => res.render('result', { fiveDigits:data[0].fiveDigits, inputURL }))
+		.catch(error => console.log(error))
+})
