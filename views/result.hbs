@@ -4,8 +4,12 @@
 		http://localhost:3000/{{fiveDigits}}
 	</p>
 </a>
-<button id="copy" class="btn btn-outline-primary btn-lg" data-clipboard-target="#output">Copy</button>
-<script>
-	const clipboard = new ClipboardJS('.btn');
-</script>
-
+<button id="copy" class="btn btn-outline-primary btn-lg" onclick="copy()">Copy</button>
+ <script>
+    function copy() {
+      const URL = document.getElementById("output")
+      navigator.clipboard.writeText(URL.innerText)
+        .then(() => alert('copied'))
+        .catch(error => console.log(error))
+    }
+  </script>
