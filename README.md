@@ -29,7 +29,7 @@
   或是
   <pre><code>npm run start</code></pre>
 
-  5. 開啟網頁瀏覽器並連結到此網址即可瀏覽本專案
+  5. 開啟網頁瀏覽器並連結到此網址即可開始使用短網址縮短器囉
    <pre><code>http://localhost:3000</code></pre>
   
 <h3>開發工具及版本 (dev tools information)：</h3>
