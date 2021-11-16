@@ -6,13 +6,7 @@ const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const generate5digits = require('./generate5digits')
 const routes = require('./routes')
-
-// database connection
-const mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost/URL-shortener')
-const db = mongoose.connection
-db.on('error', () => console.log('Mongoose error.'))
-db.once('open', () => console.log('Mongoose connected.'))
+require('./config/mongoose')
 
 // view engine setting
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname:'.hbs'}))
