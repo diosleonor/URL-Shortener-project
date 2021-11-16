@@ -1,15 +1,36 @@
-original ver:
+Alpha Camp 學期2-3：自學經驗回顧
+
+前言
+好，經過了兩個學期終於打算來寫個自學經驗回顧了！
+其實在上第一學期的時候就有類似的分享作業出現，不過當時覺得懶所以也沒有交那份作業，那為何我這次要來寫呢？
+因為我發現我忘記東西的速度有增無減。從去綠島旅潛週日回來後就開始拼命趕工寫作業，一口氣在這週三以前把短網址產生器送出。
+然後發現我已經忘記了旅潛時所見所聞！我的記憶就像去潛水，在底下的時候真情實感覺得好漂亮，上來就什麼都忘記了啥都沒留下。
+剛寫完短網址產生器也覺得好有成就感，好想寫下來告訴以後可能看到的人，跟他們說：「看吶，我在這裡卡關一整天！」
+結果過了三天到了週六，這份激動也隨時間消逝，直到我看到了同學的自學經驗回顧，重新被點燃了熱情！
+好！就來寫個網誌吧！
+
+簡介
+綜上所述已見得我的記憶力十分之不靠譜，所以這次就會針對最近剛發生的短網址產生器來回顧我的自學經驗。
+短網址產生器相信讀者並不陌生，就是丟進去一串長長的網址，它會幫你轉成短的回來給你。（其實我後來想想這功能真雞肋...）
+AC指派的作業內容除了此功能以外，還有一鍵複製、短網址須輸出格式為5碼英數組合、輸入相同網址時需產生一樣的縮址。
+
+內文
+好的進入了短網址產生器專案實作後，我便開始運用我的專案啟動小抄一切順利的啟動好了專案，接著看到短網址要產生輸出格式為隨機五碼英數組合字串，
+這個簡單，第二週的時候寫過密碼產生器，回去把密碼產生器微調一下就變成五碼英數字產生器了，載入到專案也是輕鬆搞定！
+然後就進入到大魔王關卡設定路由，下面是我寫出來的初代版本程式碼，可以看得出來兩種不同情境我寫了兩個路由，
+第一個情境是無腦產生短網址，但是這違背了作業要求的輸入相同網址時需產生一樣的縮址。
+第二個情境是基於資料庫中已經存在同樣網址時，需要跳出相同縮址，可是如果沒有的話他並不會產生一組新的資料。
+// first ver: 無腦短網址產生器
 app.post('/result', (req, res) => {
 	const input = req.body //{inputURL:'http://google.com'}
 	const inputURL = req.body.inputURL // 'http://'
 	const fiveDigits = generate5digits() //亂數五碼
-	// URLshortener.find({'':''})
 	return URLshortener.create({ inputURL, fiveDigits })
 		.then(() => res.render('result', { fiveDigits, inputURL }))
 		.catch(error => console.log(error))
 })
 
-// 輸入相同網址時，產生一樣的縮址。
+// second ver: 輸入相同網址時，產生一樣的縮址。
 app.post('/result', (req, res) => {
 	const input = req.body //{inputURL:'http://google.com'}
 	const inputURL = req.body.inputURL // 'http://...'
@@ -19,3 +40,25 @@ app.post('/result', (req, res) => {
 		.then(data => res.render('result', { fiveDigits:data[0].fiveDigits, inputURL }))
 		.catch(error => console.log(error))
 })
+
+這兩個情境分享的是同樣的路由，所以不能共存，然後我就用了一天找遍各種辦法來把這兩段內容寫在一起。
+重點就是要寫出這段功能：在資料庫中「搜尋」有沒有和輸入網址相符的網址，如有則返回一樣的縮址，如無則「新增」一組資料。
+一開始我先用第二個情境的程式碼去改寫，馬上發現第一個問題：明明資料庫裡沒有資料，我還是能印出find()回傳的東西:一堆莫名其妙我不需要的東西。
+後來上網搜尋mongoose的搜尋功能裡面有個findOne()，裡面的一句話讓我了解我到底是卡在了哪裡：「find()返回的是指標，findone()返回的是文檔」。
+第二個問題則是我一直鬼打牆的用if-else的方法來連接兩種情境，但總是無法印出理想的結果。
+嘗試了一天未果決定觀摩參考答案，看完直接眼前一黑，我完全忘記了三元運算子的存在了。
+只要用三元運算子我就不需要寫了這麼一長串if-else還很難跟Promise配合，於是最終的版本就這樣誕生了！
+// final ver:
+app.post('/result', (req, res) => {
+	const fiveDigits = generate5digits()
+	// 用inputURL為依據找出一筆資料
+	// 以三元運算子判斷資料是否存在，不存在就創一個
+	URLshortener.findOne({inputURL:req.body.inputURL})// 這裡會回傳一筆「資料」而不是一個「reference」
+	.then(data => data ? data : URLshortener.create({ inputURL:req.body.inputURL, fiveDigits }))
+	.then(data => res.render('result', { fiveDigits:data.fiveDigits, inputURL:req.body.inputURL}))
+	.catch(error => console.log(error))
+})
+
+上面寫的說明好像很簡單，但是中間卻經歷了許多的糾結，例如findOne().then()之後不能接.create()也讓我卡很久！
+感覺上好像說得通，但是實際上卻是不行的地方還是蠻多的，也就是說，我對於Promise的用法還是不熟練，才會造成此情形。
+
